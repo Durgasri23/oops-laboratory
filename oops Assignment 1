@@ -1,0 +1,54 @@
+//Durgasri S
+//2117240070081
+
+
+package polymorphismDemoproject;
+
+
+	class User {
+	    public void login() {
+	        System.out.println("User logged in with basic credentials.");
+	    }
+	}
+
+	// Derived class - Student
+	class Student extends User {
+	    @Override
+	    public void login() {
+	        System.out.println("Student logged in with Student ID and Password.");
+	    }
+	}
+
+	// Derived class - Instructor
+	class Instructor extends User {
+	    @Override
+	    public  void login() {
+	        System.out.println("Instructor logged in with Instructor ID and Password.");
+	    }
+	}
+
+	// Main class
+	public class PolymorphismDemo {
+	    public static void main(String[] args) {
+	        // Base class reference, base class object
+	        User u1 = new User();
+	        u1.login();  // Calls User's login()
+
+	        // Base class reference, derived class object (Student)
+	        User u2 = new Student();
+	        u2.login();  // Calls Student's login()
+
+	        // Base class reference, derived class object (Instructor)
+	        User u3 = new Instructor();
+	        u3.login();  // Calls Instructor's login()
+	    }
+	}
+
+
+output:
+User logged in with basic credentials.
+Student logged in with Student ID and Password.
+Instructor logged in with Instructor ID and Password.
+
+
+
