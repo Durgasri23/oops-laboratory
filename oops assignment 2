@@ -1,0 +1,57 @@
+//Durgasri S
+//2117240070081
+package myplugins;
+
+
+
+	public interface Plugin {
+	    void run();
+	}
+
+
+package myplugins;
+
+
+
+	public class SamplePlugin implements Plugin {
+	    @Override
+	    public void run() {
+	        System.out.println("Sample Plugin is running...");
+	    }
+	}
+package loader;
+import java.lang.reflect.Method;
+
+
+		
+
+		public class DynamicClassLoaderDemo {
+		    public static void main(String[] args) {
+		        try {
+		            
+		        	  System.out.println("Durgasri S");
+				        System.out.println("2117240070081");
+		            String className = "myplugins.SamplePlugin";
+
+		            Class<?> clazz = Class.forName(className);
+		            Object instance = clazz.getDeclaredConstructor().newInstance();
+		            Method runMethod = clazz.getMethod("run");
+		            runMethod.invoke(instance);
+
+		        } catch (Exception e) {
+		            e.printStackTrace();
+		        }
+		      
+		        
+		    }
+		
+
+	}
+
+Output:Durgasri S
+2117240070081
+Sample Plugin is running...
+
+
+
+
