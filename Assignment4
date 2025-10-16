@@ -1,0 +1,84 @@
+//Durgasri S
+//2117240070081
+import org.java_websocket.server.WebSocketServer;
+import org.java_websocket.WebSocket;
+import org.java_websocket.handshake.ClientHandshake;
+import java.net.InetSocketAddress;
+
+public class WebSocketServerExample extends WebSocketServer {
+    public WebSocketServerExample(int port) {
+        super(new InetSocketAddress(port));
+    }
+
+    @Override
+    public void onOpen(WebSocket conn, ClientHandshake handshake) {
+        System.out.println("New connection: " + conn.getRemoteSocketAddress());
+    }
+
+    @Override
+    public void onMessage(WebSocket conn, String message) {
+        System.out.println("Received: " + message);
+        conn.send("Echo: " + message);
+    }
+
+    @Override
+    public void onClose(WebSocket conn, int code, String reason, boolean remote) {
+        System.out.println("Connection closed: " + conn.getRemoteSocketAddress());
+    }
+
+    @Override
+    public void onError(WebSocket conn, Exception ex) {
+        ex.printStackTrace();
+    }
+
+    public static void main(String[] args) {
+        WebSocketServerExample server = new WebSocketServerExample(8887);
+        server.start();
+        System.out.println("WebSocket server started on port 8887");
+    }
+}
+
+import org.java_websocket.client.WebSocketClient;
+import org.java_websocket.handshake.ServerHandshake;
+import java.net.URI;
+
+public class WebSocketClientExample extends WebSocketClient {
+    public WebSocketClientExample(URI serverURI) {
+        super(serverURI);
+    }
+
+    @Override
+    public void onOpen(ServerHandshake handshake) {
+        System.out.println("Connected to server");
+        send("Hello Server!");
+    }
+
+    @Override
+    public void onMessage(String message) {
+        System.out.println("Received from server: " + message);
+        close();
+    }
+
+    @Override
+    public void onClose(int code, String reason, boolean remote) {
+        System.out.println("Connection closed");
+    }
+
+    @Override
+    public void onError(Exception ex) {
+        ex.printStackTrace();
+    }
+
+    public static void main(String[] args) throws Exception {
+        WebSocketClientExample client =
+            new WebSocketClientExample(new URI("ws://localhost:8887"));
+        client.connectBlocking();
+    }
+}
+output:Durgasri S
+2117240070081
+Server started on port:8887
+New Connection:/127.0.0.1:53428
+Received:Hello
+Echo:Hello
+Connection closed:/127.0.0.1:53428
