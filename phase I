@@ -1,0 +1,111 @@
+//Durgasri S
+//2117240070081
+//phase I mini project
+import java.io.*;
+import java.net.*;
+import java.sql.*;
+
+public class ServerMain {
+    public static void main(String[] args) {
+        int port = 5000;
+        try (ServerSocket serverSocket = new ServerSocket(port)) {
+            System.out.println("Server started... Waiting for client...");
+
+            while (true) {
+                Socket socket = serverSocket.accept();
+                System.out.println("Client connected.");
+
+                DataInputStream dis = new DataInputStream(socket.getInputStream());
+                DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
+
+                String username = dis.readUTF();
+                String password = dis.readUTF();
+
+                String response = handleUser(username, password);
+                dos.writeUTF(response);
+
+                socket.close();
+            }
+
+        } catch (IOException e) {
+            System.out.println("Server Error: " + e.getMessage());
+        }
+    }
+
+    // JDBC code to handle user validation
+    private static String handleUser(String username, String password) {
+        String url = "jdbc:mysql://localhost:3306/votingdb";
+        String user = "root"; // change if needed
+        String pass = ""; // your MySQL password
+
+        try (Connection con = DriverManager.getConnection(url, user, pass)) {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+
+            // Check if user exists
+            PreparedStatement check = con.prepareStatement("SELECT voted FROM users WHERE username=? AND password=?");
+            check.setString(1, username);
+            check.setString(2, password);
+            ResultSet rs = check.executeQuery();
+
+            if (rs.next()) {
+                boolean voted = rs.getBoolean("voted");
+                if (voted) {
+                    return "You have already voted!";
+                } else {
+                    PreparedStatement update = con.prepareStatement("UPDATE users SET voted=TRUE WHERE username=?");
+                    update.setString(1, username);
+                    update.executeUpdate();
+                    return "Vote Recorded Successfully!";
+                }
+            } else {
+                // Register new user
+                PreparedStatement insert = con.prepareStatement("INSERT INTO users(username,password,voted) VALUES(?,?,FALSE)");
+                insert.setString(1, username);
+                insert.setString(2, password);
+                insert.executeUpdate();
+                return "New user registered successfully. Please log in again to vote.";
+            }
+
+        } catch (Exception e) {
+            return "Database Error: " + e.getMessage();
+        }
+    }
+package client;
+import java.io.*;
+import java.net.*;
+import java.util.Scanner;
+
+public class ClientMain {
+    public static void main(String[] args) {
+        String serverAddress = "localhost";
+        int port = 5000;
+
+        try (
+            Socket socket = new Socket(serverAddress, port);
+            DataInputStream dis = new DataInputStream(socket.getInputStream());
+            DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
+            Scanner sc = new Scanner(System.in)
+        ) {
+            System.out.println("Connected to Voting Server!");
+
+            // Step 1: Get username and password
+            System.out.print("Enter username: ");
+            String username = sc.nextLine();
+            System.out.print("Enter password: ");
+            String password = sc.nextLine();
+
+            // Step 2: Send login data
+            dos.writeUTF(username);
+            dos.writeUTF(password);
+
+            // Step 3: Receive server response
+            String response = dis.readUTF();
+            System.out.println("\nServer Response: " + response);
+
+        } catch (IOException e) {
+            System.out.println("Error connecting to server: " + e.getMessage());
+        }
+    }
+}
+
+
